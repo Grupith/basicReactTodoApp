@@ -1,10 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 
 
 function App() {
   const [todos, setTodos] = useState([]);
   const [todo, setTodo] = useState('');
+
+  // Ran when App component gets updated
+  useEffect(() => {
+    const tempTodos = localStorage.getItem('stored-todos');
+    const loadedTodos = JSON.parse(tempTodos);
+
+    if (loadedTodos) {
+      setTodos(loadedTodos);
+    }
+  }, []);
+
+  // Ran when Todos get updated
+  useEffect(() => {
+    const tempTodos = JSON.stringify(todos);
+    localStorage.setItem('stored-todos', tempTodos);
+
+  }, [todos]);
+
+  const resetTodos = () => {
+        localStorage.clear();
+        setTodos([]);
+  }
+
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -37,9 +60,10 @@ function App() {
 
   return (
     <div className="App">
+      <div className='resetButton' onClick={resetTodos}>Clear List</div>
       <h1>Task Tracker</h1>
       <form onSubmit={handleSubmit}>
-        <input type='text' onChange={(e) => setTodo(e.target.value)} value={todo} />
+        <input type='text' required onChange={(e) => setTodo(e.target.value)} value={todo} />
         <button type='submit'>AddTodo</button>
       </form>
       {todos.map((todo) => <div key={todo.id} className='todoContainer'>
